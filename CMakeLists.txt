@@ -5,8 +5,12 @@ project(tetris)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# For Neovim
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 set(SOURCES
     src/main.cpp
+    src/game.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
