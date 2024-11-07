@@ -5,7 +5,7 @@
 #include "standard_pieces.hpp"
 #include "game.hpp"
 
-using std::unique_ptr, std::make_unique;
+using std::make_shared;
 
 // Window
 const int SCREEN_WIDTH = 800;
@@ -100,7 +100,7 @@ void game::tickPiece() {
         return;
     }
 
-    if (ticksElapsed % 30 == 0) {
+    if (ticksElapsed % 15 == 0) {
         if (!attemptDrop()) {
             solidifyPiece();
             return;
@@ -141,6 +141,8 @@ bool attemptDrop() {
     return true;
 }
 
+void checkBoard();
+
 void solidifyPiece() {
     int width = piece->getWidth();
 
@@ -157,6 +159,33 @@ void solidifyPiece() {
         }
     }
     piece = nullptr;
+    checkBoard();
+}
+
+void clearLine(int line);
+
+void checkBoard() {
+    for (int y = 0; y < NUM_ROWS; y++) {
+        for (int x = 0; x < NUM_COLUMNS; x++) {
+            if (!board.tileAt(x, y)->isFilled()) {
+                break;
+            }
+            if (x == NUM_COLUMNS - 1) {
+                clearLine(y);
+            }
+        }
+    }
+}
+
+void clearLine(int line) {
+    for (int y = line; y > 0; y--) {
+        for (int x = 0; x < NUM_COLUMNS; x++) {
+            board.put(x, y, board.tileAt(x, y - 1));
+        }
+    }
+    for (int x = 0; x < NUM_COLUMNS; x++) {
+        board.put(x, 0, make_shared<Tile>());
+    }
 }
 
 void randomizePiece() {
