@@ -35,6 +35,9 @@ const char* T_PIECE[] = {"   ", "###", " # "};
 unique_ptr<Piece> piece = nullptr;
 int pieceX, pieceY;
 
+// Game state
+bool gameOver = false;
+
 using namespace game;
 
 Board board(NUM_COLUMNS, NUM_ROWS);
@@ -42,13 +45,17 @@ Board board(NUM_COLUMNS, NUM_ROWS);
 void game::run() {
     init();
 
-    while (!WindowShouldClose()) {
+    while (!gameOver && !WindowShouldClose()) {
         tick();
 
         BeginDrawing();
         ClearBackground(BLACK);
         drawBoard();
         drawPiece();
+        EndDrawing();
+    }
+    while (!WindowShouldClose()) {
+        BeginDrawing();
         EndDrawing();
     }
     CloseWindow();
@@ -66,11 +73,15 @@ void game::tick() {
     ticksElapsed++; // Times stops for no one...
 }
 
+
+bool attemptDrop();
+void solidifyPiece();
+
 void game::tickPiece() {
     if (piece == nullptr) {
         piece = make_unique<Piece>(3, T_PIECE, MAGENTA);
         pieceX = NUM_COLUMNS / 2;
-        pieceY = -1;
+        pieceY = -2;
     }
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_X)) {
         piece->rotate();
@@ -80,14 +91,74 @@ void game::tickPiece() {
         pieceX--;
     } else if (IsKeyPressed(KEY_RIGHT)) {
         pieceX++;
+    } else if (IsKeyPressed(KEY_DOWN)) {
+        if (!attemptDrop()) {
+            solidifyPiece();
+            return;
+        }
+    } else if (IsKeyPressed(KEY_SPACE)) {
+        while (attemptDrop()) {}
+        solidifyPiece();
+        return;
     }
 
     if (ticksElapsed % 30 == 0) {
-        pieceY++;
-        if (pieceY > NUM_ROWS) {
-            piece = nullptr;
+        if (!attemptDrop()) {
+            solidifyPiece();
+            return;
         }
     }
+}
+
+// Returns true on success
+bool attemptDrop() {
+    int width = piece->getWidth();
+
+    pieceY++;
+    for (int y = 0; y < width; y++) {
+        // Skip checking above the board
+        if (pieceY + y < 0) {
+            continue;
+        }
+        for (int x = 0; x < width; x++) {
+            // Skip checking outside of the board
+            if (pieceX + x < 0 || pieceX + x >= NUM_COLUMNS) {
+                continue;
+            }
+            // Check if the piece is still above the bottom of the board
+            if (pieceY + y >= NUM_ROWS) {
+                if (piece->isColliding(x, y)) {
+                    pieceY--;
+                    return false;
+                }
+                continue;
+            }
+            // Check if the piece is colliding with any other tiles
+            if (board.tileAt(pieceX + x, pieceY + y)->isFilled() && piece->isColliding(x, y)) {
+                pieceY--;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void solidifyPiece() {
+    int width = piece->getWidth();
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < width; y++) {
+            if (!piece->isColliding(x, y)) {
+                continue;
+            }
+            if (pieceY + y < 0) {
+                gameOver = true;
+                return;
+            }
+            board.put(pieceX + x, pieceY + y, piece->tileAt(x, y));
+        }
+    }
+    piece = nullptr;
 }
 
 void game::drawBoard() {
@@ -106,11 +177,9 @@ void game::drawPiece() {
     if (piece == nullptr) {
         return;
     }
-    const int pieceOffsetY = (piece->getWidth() - 1) * -TILE_SIZE;
-
     for (int x = 0; x < piece->getWidth(); x++) {
         for (int y = 0; y < piece->getWidth(); y++) {
-            DrawRectangle((pieceX + x) * TILE_SIZE + BOARD_OFFSET, (pieceY + y) * TILE_SIZE + pieceOffsetY, TILE_SIZE, TILE_SIZE, piece->tileAt(x, y)->getColor());
+            DrawRectangle((pieceX + x) * TILE_SIZE + BOARD_OFFSET, (pieceY + y) * TILE_SIZE, TILE_SIZE, TILE_SIZE, piece->tileAt(x, y)->getColor());
         }
     }
 }
