@@ -1,8 +1,8 @@
-#include <iostream>
 #include <memory>
 #include <raylib.h>
 #include "board.hpp"
 #include "piece.hpp"
+#include "standard_pieces.hpp"
 #include "game.hpp"
 
 using std::unique_ptr, std::make_unique;
@@ -28,11 +28,9 @@ const int BOARD_SIZE_Y = NUM_ROWS * TILE_SIZE;
 // Center the board
 const int BOARD_OFFSET = SCREEN_WIDTH / 2 - (TILE_SIZE * NUM_COLUMNS) / 2;
 
-// Piece shapes
-const char* T_PIECE[] = {"   ", "###", " # "};
-
 // The piece
-unique_ptr<Piece> piece = nullptr;
+const int NUM_PIECES = 7;
+Piece* piece = nullptr;
 int pieceX, pieceY;
 
 // Game state
@@ -76,11 +74,11 @@ void game::tick() {
 
 bool attemptDrop();
 void solidifyPiece();
+void randomizePiece();
 
 void game::tickPiece() {
     if (piece == nullptr) {
-        piece = make_unique<Piece>(3, T_PIECE, MAGENTA);
-        pieceX = NUM_COLUMNS / 2;
+        randomizePiece();
         pieceY = -2;
     }
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_X)) {
@@ -159,6 +157,33 @@ void solidifyPiece() {
         }
     }
     piece = nullptr;
+}
+
+void randomizePiece() {
+    int pieceNumber = rand() % NUM_PIECES;
+    switch (pieceNumber) {
+        case 0:
+            piece = pieces::LINE;
+            return;
+        case 1:
+            piece = pieces::J;
+            return;
+        case 2:
+            piece = pieces::L;
+            return;
+        case 3:
+            piece = pieces::SQUARE;
+            return;
+        case 4:
+            piece = pieces::S;
+            return;
+        case 5:
+            piece = pieces::T;
+            return;
+        case 6:
+            piece = pieces::Z;
+            return;
+    }
 }
 
 void game::drawBoard() {

@@ -17,6 +17,7 @@ public:
     Piece(int width, const char** shape, Color color);
     void rotate();
     void reverseRotate();
+    void resetRotation();
     shared_ptr<Tile> tileAt(int x, int y);
     bool isColliding(int x, int y);
     inline int getWidth() {

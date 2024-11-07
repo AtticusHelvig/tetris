@@ -26,6 +26,10 @@ void Piece::reverseRotate() {
     rotation = (rotation + 3) % 4;
 }
 
+void Piece::resetRotation() {
+    rotation = 0;
+}
+
 shared_ptr<Tile> Piece::tileAt(int x, int y) {
     switch (rotation) {
         case 0:
