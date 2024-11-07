@@ -14,8 +14,8 @@ private:
 public:
     Tile() : filled(false) {};
     Tile(Color color) : filled(true), color(color) {};
-    bool isFilled() { return filled; }
-    Color getColor() {
+    inline bool isFilled() { return filled; }
+    inline Color getColor() {
         if (filled) {
             return color;
         }
