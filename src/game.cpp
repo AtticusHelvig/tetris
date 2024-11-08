@@ -40,6 +40,8 @@ using namespace game;
 
 Board board(NUM_COLUMNS, NUM_ROWS);
 
+void drawGridLines();
+
 void game::run() {
     init();
 
@@ -50,6 +52,7 @@ void game::run() {
         ClearBackground(BLACK);
         drawBoard();
         drawPiece();
+        drawGridLines();
         EndDrawing();
     }
     while (!WindowShouldClose()) {
@@ -71,7 +74,7 @@ void game::tick() {
     ticksElapsed++; // Times stops for no one...
 }
 
-
+bool checkCollision();
 bool attemptDrop();
 void solidifyPiece();
 void randomizePiece();
@@ -83,12 +86,24 @@ void game::tickPiece() {
     }
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_X)) {
         piece->rotate();
+        if (checkCollision()) {
+            piece->reverseRotate();
+        }
     } else if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_Z)) {
         piece->reverseRotate();
+        if (checkCollision()) {
+            piece->rotate();
+        }
     } else if (IsKeyPressed(KEY_LEFT)) {
         pieceX--;
+        if (checkCollision()) {
+            pieceX++;
+        }
     } else if (IsKeyPressed(KEY_RIGHT)) {
         pieceX++;
+        if (checkCollision()) {
+            pieceX--;
+        }
     } else if (IsKeyPressed(KEY_DOWN)) {
         if (!attemptDrop()) {
             solidifyPiece();
@@ -108,9 +123,35 @@ void game::tickPiece() {
     }
 }
 
+bool checkCollision() {
+    const int width = piece->getWidth();
+
+    for (int x = 0; x < width; x++) {
+        const int TILE_X = pieceX + x;
+        for (int y = 0; y < width; y++) {
+            const int TILE_Y = pieceY + y;
+            // Check if the piece is within the side bounds
+            if ((TILE_X < 0 || TILE_X >= NUM_COLUMNS) && piece-> isColliding(x, y)) {
+                return true;
+            }
+            // Skip collisions above board
+            if (TILE_Y < 0) {
+                continue;
+            }
+            if (TILE_Y >= NUM_ROWS && piece->isColliding(x, y)) {
+                return true;
+            }
+            if (piece->isColliding(x, y) && board.tileAt(TILE_X, TILE_Y)->isFilled()) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 // Returns true on success
 bool attemptDrop() {
-    int width = piece->getWidth();
+    const int width = piece->getWidth();
 
     pieceY++;
     for (int y = 0; y < width; y++) {
@@ -190,29 +231,31 @@ void clearLine(int line) {
 
 void randomizePiece() {
     int pieceNumber = rand() % NUM_PIECES;
+
     switch (pieceNumber) {
         case 0:
             piece = pieces::LINE;
-            return;
+            break;
         case 1:
             piece = pieces::J;
-            return;
+            break;
         case 2:
             piece = pieces::L;
-            return;
+            break;
         case 3:
             piece = pieces::SQUARE;
-            return;
+            break;
         case 4:
             piece = pieces::S;
-            return;
+            break;
         case 5:
             piece = pieces::T;
-            return;
+            break;
         case 6:
             piece = pieces::Z;
-            return;
+            break;
     }
+    pieceX = (NUM_COLUMNS / 2) - (piece->getWidth() / 2);
 }
 
 void game::drawBoard() {
@@ -235,5 +278,14 @@ void game::drawPiece() {
         for (int y = 0; y < piece->getWidth(); y++) {
             DrawRectangle((pieceX + x) * TILE_SIZE + BOARD_OFFSET, (pieceY + y) * TILE_SIZE, TILE_SIZE, TILE_SIZE, piece->tileAt(x, y)->getColor());
         }
+    }
+}
+
+void drawGridLines() {
+    for (int i = 0; i <= NUM_COLUMNS; i++) {
+        DrawLine(i * TILE_SIZE + BOARD_OFFSET, 0, i * TILE_SIZE + BOARD_OFFSET, BOARD_SIZE_Y, RAYWHITE);
+    }
+    for (int i = 0; i <= NUM_ROWS; i++) {
+        DrawLine(BOARD_OFFSET, i * TILE_SIZE, BOARD_OFFSET + BOARD_SIZE_X, i * TILE_SIZE, RAYWHITE);
     }
 }
