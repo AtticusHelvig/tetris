@@ -25,12 +25,19 @@ public:
 
 class Board {
 private:
-    int width, height;
+    const int width;
+    const int height;
     vector<shared_ptr<Tile>> tiles;
 
 public:
     Board(int width, int height);
     shared_ptr<Tile> tileAt(int x, int y);
     void put(int x, int y, shared_ptr<Tile> tile);
+    inline int getWidth(void) {
+        return width;
+    }
+    inline int getHeight(void) {
+        return height;
+    }
 };
 

@@ -13,6 +13,7 @@ set(SOURCES
     src/game.cpp
     src/board.cpp
     src/piece.cpp
+    src/raylib_display.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

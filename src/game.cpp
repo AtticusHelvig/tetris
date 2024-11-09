@@ -1,17 +1,12 @@
 #include <memory>
 #include <raylib.h>
 #include "board.hpp"
+#include "raylib_display.hpp"
 #include "piece.hpp"
 #include "standard_pieces.hpp"
 #include "game.hpp"
 
 using std::make_shared;
-
-// Window
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 800;
-const char* TITLE = "Tetris Clone - Atticus Helvig";
-const int FPS = 60;
 
 // Tick rate
 const float TICKS_PER_SECOND = 30.0f;
@@ -21,55 +16,46 @@ int ticksElapsed = 0;
 // Board size
 const int NUM_ROWS = 20;
 const int NUM_COLUMNS = 10;
-const int TILE_SIZE = SCREEN_HEIGHT / NUM_ROWS;
-const int BOARD_SIZE_X = NUM_COLUMNS * TILE_SIZE;
-const int BOARD_SIZE_Y = NUM_ROWS * TILE_SIZE;
-
-// Center the board
-const int BOARD_OFFSET = SCREEN_WIDTH / 2 - (TILE_SIZE * NUM_COLUMNS) / 2;
 
 // The piece
 const int NUM_PIECES = 7;
-Piece* piece = nullptr;
+Piece* piece;
 int pieceX, pieceY;
 
 // Game state
 bool gameOver = false;
 
-using namespace game;
-
+// Board
 Board board(NUM_COLUMNS, NUM_ROWS);
 
-void drawGridLines();
+// Display
+RaylibDisplay display(&board);
+
+void drawFrame();
 
 void game::run() {
-    init();
-
-    while (!gameOver && !WindowShouldClose()) {
+    while (!gameOver) {
         tick();
-
-        BeginDrawing();
-        ClearBackground(BLACK);
-        drawBoard();
-        drawPiece();
-        drawGridLines();
-        EndDrawing();
+        drawFrame();
     }
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-        EndDrawing();
-    }
-    CloseWindow();
 }
 
-void game::init() {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, TITLE);
-    SetTargetFPS(FPS);
+void drawFrame() {
+    display.unlock();
+    display.drawBoard();
+    if (piece != nullptr) {
+        display.drawPiece(piece, pieceX, pieceY);
+    }
+    display.lock();
 }
 
-// Should be called as often as possible (e.g. every frame)
-// Responsible for changing time-based state of the game
+// Will probably be used for score etc.
+void game::init() {}
+
 void game::tick() {
+    if (IsKeyPressed(KEY_Q) || IsKeyPressed(KEY_ESCAPE)) {
+        gameOver = true;
+    }
     tickPiece();
     ticksElapsed++; // Times stops for no one...
 }
@@ -258,34 +244,3 @@ void randomizePiece() {
     pieceX = (NUM_COLUMNS / 2) - (piece->getWidth() / 2);
 }
 
-void game::drawBoard() {
-    // Board background
-    DrawRectangle(BOARD_OFFSET, 0, BOARD_SIZE_X, BOARD_SIZE_Y, GRAY);
-
-    // Draw tiles
-    for (int y = 0; y < NUM_ROWS; y++) {
-        for (int x = 0; x < NUM_COLUMNS; x++) {
-            DrawRectangle(BOARD_OFFSET + x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, board.tileAt(x, y)->getColor());
-        }
-    }
-}
-
-void game::drawPiece() {
-    if (piece == nullptr) {
-        return;
-    }
-    for (int x = 0; x < piece->getWidth(); x++) {
-        for (int y = 0; y < piece->getWidth(); y++) {
-            DrawRectangle((pieceX + x) * TILE_SIZE + BOARD_OFFSET, (pieceY + y) * TILE_SIZE, TILE_SIZE, TILE_SIZE, piece->tileAt(x, y)->getColor());
-        }
-    }
-}
-
-void drawGridLines() {
-    for (int i = 0; i <= NUM_COLUMNS; i++) {
-        DrawLine(i * TILE_SIZE + BOARD_OFFSET, 0, i * TILE_SIZE + BOARD_OFFSET, BOARD_SIZE_Y, RAYWHITE);
-    }
-    for (int i = 0; i <= NUM_ROWS; i++) {
-        DrawLine(BOARD_OFFSET, i * TILE_SIZE, BOARD_OFFSET + BOARD_SIZE_X, i * TILE_SIZE, RAYWHITE);
-    }
-}
