@@ -3,7 +3,7 @@
 #include <raylib.h>
 #include "raylib_display.hpp"
 
-RaylibDisplay::RaylibDisplay(Board* board) :
+RaylibDisplay::RaylibDisplay(Board* const board) :
     Display(board)
 {
     int maxTileWidth = WIDTH / BOARD_WIDTH;

@@ -1,21 +1,22 @@
-#include <stdexcept>
 #include "board.hpp"
+#include <cassert>
 
-using std::make_shared, std::runtime_error;
+Board::Board(int width, int height) :
+    width(width),
+    height(height),
+    tiles(new Tile*[width * height]) {}
 
-Board::Board(int width, int height) : width(width), height(height), tiles(width * height, make_shared<Tile>()) {}
-
-shared_ptr<Tile> Board::tileAt(int x, int y) {
-    if (x < 0 || y < 0 || x >= width || y >= height) {
-        throw new runtime_error("Cannot access a tile out of bounds.");
-    }
-    return tiles[width * y + x];
+Board::~Board() {
+    delete[] tiles;
 }
 
-void Board::put(int x, int y, shared_ptr<Tile> tile) {
-    if (x < 0 || y < 0 || x >= width || y >= height) {
-        throw new runtime_error("Cannot put a tile out of bounds.");
-    }
-    tiles[width * y + x] = tile;
+Tile* Board::tileAt(int x, int y) {
+    assert(x >= 0 && y >= 0 && x < width && y < height);
+    return tiles[y * width + x];
+}
+
+void Board::put(int x, int y, Tile* tile) {
+    assert(x >= 0 && y >= 0 && x < width && y < height);
+    tiles[y * width + x] = tile;
 }
 

@@ -1,10 +1,6 @@
 #pragma once
 
-#include <memory>
 #include <raylib.h>
-#include <vector>
-
-using std::shared_ptr, std::vector;
 
 class Tile {
 private:
@@ -27,12 +23,13 @@ class Board {
 private:
     const int width;
     const int height;
-    vector<shared_ptr<Tile>> tiles;
+    Tile** tiles;
 
 public:
     Board(int width, int height);
-    shared_ptr<Tile> tileAt(int x, int y);
-    void put(int x, int y, shared_ptr<Tile> tile);
+    ~Board();
+    Tile* tileAt(int x, int y);
+    void put(int x, int y, Tile* tile);
     inline int getWidth(void) {
         return width;
     }

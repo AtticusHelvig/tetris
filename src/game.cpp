@@ -1,12 +1,10 @@
-#include <memory>
+#include <cstdlib>
 #include <raylib.h>
 #include "board.hpp"
 #include "raylib_display.hpp"
 #include "piece.hpp"
 #include "standard_pieces.hpp"
 #include "game.hpp"
-
-using std::make_shared;
 
 // Tick rate
 const float TICKS_PER_SECOND = 30.0f;
@@ -211,7 +209,7 @@ void clearLine(int line) {
         }
     }
     for (int x = 0; x < NUM_COLUMNS; x++) {
-        board.put(x, 0, make_shared<Tile>());
+        board.put(x, 0, new Tile());
     }
 }
 
