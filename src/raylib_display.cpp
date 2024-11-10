@@ -1,4 +1,5 @@
 #include <cassert>
+#include <iostream>
 #include <raylib.h>
 #include "raylib_display.hpp"
 
@@ -78,4 +79,9 @@ void RaylibDisplay::drawPiece(Piece* piece, int posX, int posY) {
             DrawRectangle(tileX, tileY, tileSize, tileSize, tileColor);
         }
     }
+}
+
+// Temporary for testing score functionality
+void RaylibDisplay::drawScore(unsigned int score) {
+    std::cout << "Score: " << score << '\n';
 }

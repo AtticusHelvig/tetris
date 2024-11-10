@@ -27,5 +27,6 @@ public:
     virtual void lock(void) = 0;
     virtual void drawBoard(void) = 0;
     virtual void drawPiece(Piece* piece, int posX, int posY) = 0;
+    virtual void drawScore(unsigned int score);
 };
 

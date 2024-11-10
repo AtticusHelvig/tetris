@@ -28,4 +28,5 @@ public:
     void lock(void) override;
     void drawBoard(void) override;
     void drawPiece(Piece* piece, int posX, int posY) override;
+    void drawScore(unsigned int scored) override;
 };
