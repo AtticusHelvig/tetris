@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include "board.hpp"
 #include "raylib_display.hpp"
+#include "raylib_input.hpp"
 #include "piece.hpp"
 #include "standard_pieces.hpp"
 #include "game.hpp"
@@ -27,7 +28,10 @@ bool gameOver = false;
 Board board(NUM_COLUMNS, NUM_ROWS);
 
 // Display
-Display *display;
+RaylibDisplay display(&board);
+
+// Input
+RaylibInputHandler input;
 
 namespace game {
     void init();
@@ -51,21 +55,19 @@ void game::run() {
 }
 
 void game::drawFrame() {
-    display->unlock();
-    display->drawBoard();
+    display.unlock();
+    display.drawBoard();
     if (piece != nullptr) {
-        display->drawPiece(piece, pieceX, pieceY);
+        display.drawPiece(piece, pieceX, pieceY);
     }
-    display->lock();
+    display.lock();
 }
 
 // Will probably be used for score etc.
-void game::init() {
-    display = new RaylibDisplay(&board);
-}
+void game::init() {}
 
 void game::tick() {
-    if (IsKeyPressed(KEY_Q) || IsKeyPressed(KEY_ESCAPE)) {
+    if (input.quit()) {
         gameOver = true;
     }
     tickPiece();
@@ -77,32 +79,32 @@ void game::tickPiece() {
         randomizePiece();
         pieceY = -2;
     }
-    if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_X)) {
+    if (input.rotateClockwise()) {
         piece->rotate();
         if (checkCollision()) {
             piece->reverseRotate();
         }
-    } else if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_Z)) {
+    } else if (input.rotateCounterclockwise()) {
         piece->reverseRotate();
         if (checkCollision()) {
             piece->rotate();
         }
-    } else if (IsKeyPressed(KEY_LEFT)) {
+    } else if (input.moveLeft()) {
         pieceX--;
         if (checkCollision()) {
             pieceX++;
         }
-    } else if (IsKeyPressed(KEY_RIGHT)) {
+    } else if (input.moveRight()) {
         pieceX++;
         if (checkCollision()) {
             pieceX--;
         }
-    } else if (IsKeyPressed(KEY_DOWN)) {
+    } else if (input.softDrop()) {
         if (!attemptDrop()) {
             solidifyPiece();
             return;
         }
-    } else if (IsKeyPressed(KEY_SPACE)) {
+    } else if (input.hardDrop()) {
         while (attemptDrop()) {}
         solidifyPiece();
         return;

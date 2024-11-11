@@ -14,6 +14,7 @@ set(SOURCES
     src/board.cpp
     src/piece.cpp
     src/raylib_display.cpp
+    src/raylib_input.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
