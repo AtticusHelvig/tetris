@@ -1,7 +1,6 @@
 #include <cstdlib>
 #include <raylib.h>
 #include "board.hpp"
-#include "display.hpp"
 #include "raylib_display.hpp"
 #include "piece.hpp"
 #include "standard_pieces.hpp"
@@ -28,9 +27,20 @@ bool gameOver = false;
 Board board(NUM_COLUMNS, NUM_ROWS);
 
 // Display
-RaylibDisplay *display;
+Display *display;
 
-void drawFrame();
+namespace game {
+    void init();
+    void tick();
+    void tickPiece();
+    void drawFrame();
+    bool checkCollision();
+    bool attemptDrop();
+    void solidifyPiece();
+    void randomizePiece();
+    void checkBoard();
+    void clearLine(int line);
+}
 
 void game::run() {
     game::init();
@@ -40,7 +50,7 @@ void game::run() {
     }
 }
 
-void drawFrame() {
+void game::drawFrame() {
     display->unlock();
     display->drawBoard();
     if (piece != nullptr) {
@@ -55,7 +65,6 @@ void game::init() {
 }
 
 void game::tick() {
-
     if (IsKeyPressed(KEY_Q) || IsKeyPressed(KEY_ESCAPE)) {
         gameOver = true;
     }
@@ -63,13 +72,7 @@ void game::tick() {
     ticksElapsed++; // Times stops for no one...
 }
 
-bool checkCollision();
-bool attemptDrop();
-void solidifyPiece();
-void randomizePiece();
-
 void game::tickPiece() {
-
     if (piece == nullptr) {
         randomizePiece();
         pieceY = -2;
@@ -113,7 +116,7 @@ void game::tickPiece() {
     }
 }
 
-bool checkCollision() {
+bool game::checkCollision() {
     const int width = piece->getWidth();
 
     for (int x = 0; x < width; x++) {
@@ -140,8 +143,7 @@ bool checkCollision() {
 }
 
 // Returns true on success
-bool attemptDrop() {
-
+bool game::attemptDrop() {
     const int width = piece->getWidth();
 
     pieceY++;
@@ -170,13 +172,10 @@ bool attemptDrop() {
             }
         }
     }
-
     return true;
 }
 
-void checkBoard();
-
-void solidifyPiece() {
+void game::solidifyPiece() {
     int width = piece->getWidth();
 
     for (int x = 0; x < width; x++) {
@@ -195,9 +194,7 @@ void solidifyPiece() {
     checkBoard();
 }
 
-void clearLine(int line);
-
-void checkBoard() {
+void game::checkBoard() {
     for (int y = 0; y < NUM_ROWS; y++) {
         for (int x = 0; x < NUM_COLUMNS; x++) {
             if (!board.tileAt(x, y)->isFilled()) {
@@ -210,7 +207,7 @@ void checkBoard() {
     }
 }
 
-void clearLine(int line) {
+void game::clearLine(int line) {
     for (int y = line; y > 0; y--) {
         for (int x = 0; x < NUM_COLUMNS; x++) {
             board.put(x, y, board.tileAt(x, y - 1));
@@ -221,8 +218,7 @@ void clearLine(int line) {
     }
 }
 
-void randomizePiece() {
-
+void game::randomizePiece() {
     int pieceNumber = rand() % NUM_PIECES;
 
     switch (pieceNumber) {
@@ -250,6 +246,5 @@ void randomizePiece() {
     }
     pieceX = (NUM_COLUMNS / 2) - (piece->getWidth() / 2);
     pieceY = 0;
-
 }
 
