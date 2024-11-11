@@ -6,6 +6,9 @@
  * https://strategywiki.org/wiki/Tetris/Controls
 */
 
+RaylibInputHandler::RaylibInputHandler() {}
+RaylibInputHandler::~RaylibInputHandler() {}
+
 bool RaylibInputHandler::quit() {
     return IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_Q);
 }
