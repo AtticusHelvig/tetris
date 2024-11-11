@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <raylib.h>
 #include "board.hpp"
+#include "display.hpp"
 #include "raylib_display.hpp"
 #include "piece.hpp"
 #include "standard_pieces.hpp"
@@ -27,11 +28,12 @@ bool gameOver = false;
 Board board(NUM_COLUMNS, NUM_ROWS);
 
 // Display
-RaylibDisplay display(&board);
+RaylibDisplay *display;
 
 void drawFrame();
 
 void game::run() {
+    game::init();
     while (!gameOver) {
         tick();
         drawFrame();
@@ -39,18 +41,21 @@ void game::run() {
 }
 
 void drawFrame() {
-    display.unlock();
-    display.drawBoard();
+    display->unlock();
+    display->drawBoard();
     if (piece != nullptr) {
-        display.drawPiece(piece, pieceX, pieceY);
+        display->drawPiece(piece, pieceX, pieceY);
     }
-    display.lock();
+    display->lock();
 }
 
 // Will probably be used for score etc.
-void game::init() {}
+void game::init() {
+    display = new RaylibDisplay(&board);
+}
 
 void game::tick() {
+
     if (IsKeyPressed(KEY_Q) || IsKeyPressed(KEY_ESCAPE)) {
         gameOver = true;
     }
@@ -64,6 +69,7 @@ void solidifyPiece();
 void randomizePiece();
 
 void game::tickPiece() {
+
     if (piece == nullptr) {
         randomizePiece();
         pieceY = -2;
@@ -135,6 +141,7 @@ bool checkCollision() {
 
 // Returns true on success
 bool attemptDrop() {
+
     const int width = piece->getWidth();
 
     pieceY++;
@@ -163,6 +170,7 @@ bool attemptDrop() {
             }
         }
     }
+
     return true;
 }
 
@@ -214,6 +222,7 @@ void clearLine(int line) {
 }
 
 void randomizePiece() {
+
     int pieceNumber = rand() % NUM_PIECES;
 
     switch (pieceNumber) {
@@ -240,5 +249,7 @@ void randomizePiece() {
             break;
     }
     pieceX = (NUM_COLUMNS / 2) - (piece->getWidth() / 2);
+    pieceY = 0;
+
 }
 

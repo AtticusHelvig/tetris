@@ -50,7 +50,7 @@ void RaylibDisplay::drawBoard() {
     for (int y = 0; y < BOARD_HEIGHT; y++) {
         for (int x = 0; x < BOARD_WIDTH; x++) {
             // Skip unfilled tiles
-            if (!board->tileAt(x, y)->isFilled()) {
+            if (board->tileAt(x, y) == nullptr || !board->tileAt(x, y)->isFilled()) {
                 continue;
             }
             Color tileColor = board->tileAt(x, y)->getColor();

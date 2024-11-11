@@ -4,7 +4,12 @@
 Board::Board(int width, int height) :
     width(width),
     height(height),
-    tiles(new Tile*[width * height]) {}
+    tiles(new Tile*[width * height]) 
+{
+    for (int i = 0; i < width * height; i++) {
+          tiles[i] = new Tile();
+    }
+}
 
 Board::~Board() {
     delete[] tiles;

@@ -8,7 +8,7 @@ Piece::Piece(int width, const char** shape, Color color) :
     for (int y = 0; y < width; y++) {
         for (int x = 0; x < width; x++) {
             // If the character is a space, make an empty tile, otherwise make a colored tile.
-            Tile* tile = shape[y][x] == ' ' ? nullptr : new Tile(color);
+            Tile* tile = shape[y][x] == ' ' ? new Tile() : new Tile(color);
             tiles[y * width + x] = tile;
         }
     }
@@ -42,5 +42,8 @@ Tile* Piece::tileAt(int x, int y) {
 }
 
 bool Piece::isColliding(int x, int y) {
+    if (tileAt(x, y) == nullptr) {
+        return false;
+    }
     return tileAt(x, y)->isFilled();
 }
