@@ -1,5 +1,6 @@
 #pragma once
 
+#include <raylib.h>
 #include "display.hpp"
 
 class RaylibDisplay : public Display {
@@ -9,6 +10,9 @@ private:
     const int HEIGHT = 800;
     const int FPS = 60;
     const char* TITLE = "Tetris Clone - Atticus Helvig";
+
+    // Assets
+    Image tileSprite;
 
     // Size of the tiles in pixels
     int tileSize;
@@ -20,6 +24,9 @@ private:
     // Board sizes in pixels
     int displayBoardWidth;
     int displayBoardHeight;
+
+private:
+    void drawTile(Tile* tile, int posX, int posY);
 
 public:
     RaylibDisplay(Board* board);

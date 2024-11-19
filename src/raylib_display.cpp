@@ -4,7 +4,8 @@
 #include "raylib_display.hpp"
 
 RaylibDisplay::RaylibDisplay(Board* const board) :
-    Display(board)
+    Display(board),
+    tileSprite(LoadImage("../assets/tile.png"))
 {
     int maxTileWidth = WIDTH / BOARD_WIDTH;
     int maxTileHeight = HEIGHT / BOARD_HEIGHT;
@@ -20,6 +21,9 @@ RaylibDisplay::RaylibDisplay(Board* const board) :
     }
     displayBoardWidth = BOARD_WIDTH * tileSize;
     displayBoardHeight = BOARD_HEIGHT * tileSize;
+
+    // Scale tile sprite
+    ImageResize(&tileSprite, tileSize, tileSize);
 
     InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(FPS);
@@ -56,7 +60,7 @@ void RaylibDisplay::drawBoard() {
             Color tileColor = board->tileAt(x, y)->getColor();
             int tileX = x * tileSize + boardOffsetX;
             int tileY = y * tileSize + boardOffsetY;
-            DrawRectangle(tileX, tileY, tileSize, tileSize, tileColor);
+            drawTile(board->tileAt(x, y), tileX, tileY);
         }
     }
 }
@@ -76,7 +80,7 @@ void RaylibDisplay::drawPiece(Piece* piece, int posX, int posY) {
             Color tileColor = piece->tileAt(x, y)->getColor();
             int tileX = (x + posX) * tileSize + boardOffsetX;
             int tileY = (y + posY) * tileSize + boardOffsetY;
-            DrawRectangle(tileX, tileY, tileSize, tileSize, tileColor);
+            drawTile(piece->tileAt(x, y), tileX, tileY);
         }
     }
 }
@@ -84,4 +88,11 @@ void RaylibDisplay::drawPiece(Piece* piece, int posX, int posY) {
 // Temporary for testing score functionality
 void RaylibDisplay::drawScore(unsigned int score) {
     std::cout << "Score: " << score << '\n';
+}
+
+// Positions are in pixels
+void RaylibDisplay::drawTile(Tile* tile, int posX, int posY) {
+    Color tileColor = tile->getColor();
+    Texture2D texture = LoadTextureFromImage(tileSprite);
+    DrawTexture(texture, posX, posY, tileColor);
 }
