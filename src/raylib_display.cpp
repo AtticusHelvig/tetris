@@ -22,11 +22,14 @@ RaylibDisplay::RaylibDisplay(Board* const board) :
     displayBoardWidth = BOARD_WIDTH * tileSize;
     displayBoardHeight = BOARD_HEIGHT * tileSize;
 
-    // Scale tile sprite
-    ImageResize(&tileSprite, tileSize, tileSize);
-
     InitWindow(WIDTH, HEIGHT, TITLE);
     SetTargetFPS(FPS);
+
+    // Scale tile sprite
+    ImageResize(&tileSprite, tileSize, tileSize);
+    // Tricky bug, must be done **after** InitWindow
+    texture = LoadTextureFromImage(tileSprite);
+
 }
 
 RaylibDisplay::~RaylibDisplay() {
@@ -92,7 +95,5 @@ void RaylibDisplay::drawScore(unsigned int score) {
 
 // Positions are in pixels
 void RaylibDisplay::drawTile(Tile* tile, int posX, int posY) {
-    Color tileColor = tile->getColor();
-    Texture2D texture = LoadTextureFromImage(tileSprite);
-    DrawTexture(texture, posX, posY, tileColor);
+    DrawTexture(texture, posX, posY, tile->getColor());
 }

@@ -13,6 +13,7 @@ private:
 
     // Assets
     Image tileSprite;
+    Texture2D texture;
 
     // Size of the tiles in pixels
     int tileSize;
